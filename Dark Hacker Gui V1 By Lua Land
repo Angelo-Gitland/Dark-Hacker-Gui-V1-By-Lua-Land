@@ -260,6 +260,7 @@ local function CreatePage(tabName)
         AddButton("Spring Hub", function() pcall(function() require(4829576129).SpringHub("UserName") end) end)
 
     elseif tabName == "Funs" then
+        AddLabel("FUNS")
         AddButton("Survive Forsaken Killers (Private notice)", function()
             Notify("Dear User", "I hope you enjoyed in this script! This Script Is Private!")
             SafeLoad("https://pastebin.com/raw/ud8GUnvj")
@@ -282,7 +283,7 @@ local function CreatePage(tabName)
 
     elseif tabName == "Skybox" then
         AddLabel("SKYBOX")
-        AddButton("
+        AddButton("Skeleton Skybox" function() SafeLoad("https://pastebin.com/raw/0n5faAr6") end)
 
     elseif tabName == "Decals" then
         AddLabel("Spawn a temporary part with a decal (auto-destroys after 60s).")
@@ -296,15 +297,7 @@ local function CreatePage(tabName)
         AddLabel("Tip: Use Settings -> Custom Decal ID to spawn your own.")
 
     elseif tabName == "Musics" then
-        AddLabel("Play music locally (looped). Use Stop Music in Settings to stop.")
-        -- Example music asset ids
-        AddButton("Music - Example Chill Loop", function()
-            PlayMusic("ChillLoop", "rbxassetid://184355691") -- example id (replace if you want)
-        end)
-        AddButton("Music - Example Epic Loop", function()
-            PlayMusic("EpicLoop", "rbxassetid://183860173") -- example id (replace if you want)
-        end)
-        AddLabel("Tip: Use Settings -> Custom Music ID to play your own.")
+        AddLabel("MUSICS")
 
     elseif tabName == "Settings" then
         AddLabel("Settings - Change theme & behavior")
