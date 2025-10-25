@@ -1,12 +1,16 @@
--- Dark Hacker Gui V1 | By Lua Land
+-- Dark Hacker Gui V1 | By Lua Land (Full — all pages, buttons, centered page titles, Settings + Theme)
+-- Place this as a LocalScript (StarterPlayerScripts or StarterGui) for best results in exploit environments
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
 local LP = Players.LocalPlayer
 
-local Gui = Instance.new("ScreenGui", game.CoreGui)
+-- Main GUI
+local Gui = Instance.new("ScreenGui")
 Gui.Name = "DarkHackerGuiV1"
 Gui.ResetOnSpawn = false
+Gui.Parent = game:GetService("CoreGui") -- set to CoreGui for exploit contexts; change to PlayerGui if needed
 
 local Main = Instance.new("Frame", Gui)
 Main.Size = UDim2.new(0, 520, 0, 380)
@@ -14,197 +18,453 @@ Main.Position = UDim2.new(0.5, -260, 0.5, -190)
 Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 Main.Active = true
 Main.Draggable = true
+Main.BorderSizePixel = 0
 
 local Title = Instance.new("TextLabel", Main)
 Title.Size = UDim2.new(1, 0, 0, 34)
+Title.Position = UDim2.new(0, 0, 0, 0)
 Title.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 Title.Text = "Dark Hacker Gui V1 | By Lua Land"
 Title.TextColor3 = Color3.fromRGB(0, 255, 0)
 Title.Font = Enum.Font.Code
 Title.TextSize = 20
+Title.BorderSizePixel = 0
 
 local TabFrame = Instance.new("Frame", Main)
 TabFrame.Size = UDim2.new(0, 140, 1, -40)
 TabFrame.Position = UDim2.new(0, 0, 0, 40)
 TabFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+TabFrame.BorderSizePixel = 0
 
 local ContentHolder = Instance.new("Frame", Main)
 ContentHolder.Size = UDim2.new(1, -150, 1, -50)
 ContentHolder.Position = UDim2.new(0, 150, 0, 45)
 ContentHolder.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 ContentHolder.BorderSizePixel = 0
+ContentHolder.ClipsDescendants = true
 
+-- variables
 local currentPage = nil
+local currentTheme = "Dark"
 
+-- Notify helper
 local function Notify(title, text)
-	pcall(function()
-		StarterGui:SetCore("SendNotification", {Title = title, Text = text, Duration = 3})
-	end)
+    pcall(function()
+        StarterGui:SetCore("SendNotification", {Title = title, Text = text, Duration = 3})
+    end)
 end
 
+-- Safe loader
 local function SafeLoad(url)
-	local ok, res = pcall(function() return game:HttpGet(url) end)
-	if ok then
-		local sOk, err = pcall(function() loadstring(res)() end)
-		if not sOk then Notify("Error", "Script error: ".. tostring(err)) end
-	else
-		Notify("Error", "Failed to fetch script.")
-	end
+    local ok, res = pcall(function() return game:HttpGet(url) end)
+    if ok and type(res) == "string" then
+        local sOk, err = pcall(function() loadstring(res)() end)
+        if not sOk then
+            Notify("Error", "Script error: " .. tostring(err))
+        end
+    else
+        Notify("Error", "Failed to fetch script.")
+    end
 end
 
-local function CreatePage(tabName)
-	if currentPage then currentPage:Destroy() end
-
-	local Page = Instance.new("ScrollingFrame", ContentHolder)
-	Page.Size = UDim2.new(1, -10, 1, -10)
-	Page.Position = UDim2.new(0, 5, 0, 5)
-	Page.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-	Page.ScrollBarThickness = 6
-	Page.CanvasSize = UDim2.new(0, 0, 0, 0)
-	currentPage = Page
-
-	local layout = Instance.new("UIListLayout", Page)
-	layout.Padding = UDim.new(0, 6)
-	layout.SortOrder = Enum.SortOrder.LayoutOrder
-
-	local function AddButton(name, callback)
-		local btn = Instance.new("TextButton", Page)
-		btn.Size = UDim2.new(1, -10, 0, 32)
-		btn.Text = name
-		btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-		btn.TextColor3 = Color3.fromRGB(0, 255, 0)
-		btn.Font = Enum.Font.Code
-		btn.TextSize = 14
-		btn.BorderSizePixel = 0
-		btn.MouseButton1Click:Connect(callback)
-	end
-
-	local function AddLabel(text)
-		local lbl = Instance.new("TextLabel", Page)
-		lbl.Size = UDim2.new(1, -10, 0, 26)
-		lbl.Text = text
-		lbl.TextColor3 = Color3.fromRGB(0, 255, 0)
-		lbl.Font = Enum.Font.Code
-		lbl.TextSize = 16
-		lbl.BackgroundTransparency = 1
-		lbl.TextXAlignment = Enum.TextXAlignment.Left
-	end
-
-	if tabName == "Home" then
-		AddLabel("NAME: " .. LP.Name)
-		AddLabel("ACCOUNT AGE: " .. LP.AccountAge)
-		local fpsLabel = AddLabel("FPS: Detecting...")
-		local playersLabel = AddLabel("PLAYERS: " .. #Players:GetPlayers())
-
-		RunService.RenderStepped:Connect(function(dt)
-			fpsLabel.Text = "FPS: " .. math.floor(1 / math.max(dt, 1/120))
-			playersLabel.Text = "PLAYERS: " .. #Players:GetPlayers()
-		end)
-
-		AddButton("Join Lua Land Hub", function()
-			setclipboard("https://discord.gg/mQYtHAJErm")
-			Notify("Copied!", "Copied To Clipboard!")
-		end)
-		AddButton("Join Eric_3337", function()
-			setclipboard("https://discord.gg/tkrKd7UBJG")
-			Notify("Copied!", "Copied To Clipboard!")
-		end)
-
-	elseif tabName == "Fe Script" then
-        AddLabel("FE SCRIPT")
-		AddButton("Blackhole", function() SafeLoad("https://raw.githubusercontent.com/Bac0nHck/Scripts/main/BringFlingPlayers") end)
-		AddButton("Super Ring Parts V1", function() SafeLoad("https://rawscripts.net/raw/Natural-Disaster-Survival-Super-Ring-Parts-v1-By-IKASI-27341") end)
-		AddButton("Super Ring Parts V2", function() SafeLoad("https://pastefy.app/t0djamGi/raw") end)
-		AddButton("Super Ring Parts V3", function() SafeLoad("https://pastebin.com/raw/JmAw1ucM") end)
-		AddButton("Super Ring Parts V4", function() SafeLoad("https://rawscripts.net/raw/Natural-Disaster-Survival-Super-Rings-Parts-V4-By-Lukas-24409") end)
-		AddButton("Super Ring Parts V5", function() SafeLoad("https://raw.githubusercontent.com/Lukashub-coder/Super-ring-V5/refs/heads/main/By%20lukas!!") end)
-		AddButton("Super Ring Parts V6", function() SafeLoad("https://raw.githubusercontent.com/chesslovers69/Super-ring-parts-v6/refs/heads/main/Bylukaslol") end)
-
-	elseif tabName == "Visual Script" then
-        AddLabel("VISUAL SCRIPT")
-		AddButton("c00lgui By Team c00lkidd", function() SafeLoad("https://raw.githubusercontent.com/C00lHamoot/c00lgui-1/36410b4f949d3a10e8b39fc7cdcc8cfb67aefe25/c00l%20gui") end)
-		AddButton("Potato Gui", function() SafeLoad("https://rawscripts.net/raw/Client-Replication-Potato-GUI-Lua-Version-29947") end)
-		AddButton("G00byd0lan Gui V1", function() SafeLoad("https://raw.githubusercontent.com/4izikRBX/g00byd0lan-gui-v1/refs/heads/main/g00byd0lan%20gui%20script") end)
-		AddButton("Harked Gui", function() SafeLoad("https://rawscripts.net/raw/Universal-Script-Harked-Skript-6804") end)
-		AddButton("Bluudud Gui V1", function() SafeLoad("https://rawscripts.net/raw/Universal-Script-Bluudud-gui-50126") end)
-
-	elseif tabName == "Admin Script" then
-        AddLabel("ADMIN SCRIPT")
-		AddButton("Infinite Yield", function() SafeLoad("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source") end)
-		AddButton("Kohls Admin", function() SafeLoad("https://raw.githubusercontent.com/Stefanuk12/ROBLOX/master/Games/Kohls%20Admin%20House/DarkKohls/GUI.lua") end)
-		AddButton("Legs Admin", function() SafeLoad("https://raw.githubusercontent.com/leg1337/legadmv2/main/legadminv2.lua") end)
-		AddButton("Quirky Cmds [FE]", function()
-			Notify("Notice", "This Script Only Works In Some Games!")
-			SafeLoad("https://rawscripts.net/raw/Universal-Script-QuirkyCMD-FE-admin-8667")
-		end)
-		AddButton("Brick Admin", function() SafeLoad("https://raw.githubusercontent.com/MariyaFurmanova/Library/main/un_AdminGUI") end)
-
-	elseif tabName == "Require Script" then
-        AddLabel("REQUIRE SCRIPT")
-		AddButton("Th Gui", function()
-			setclipboard('require(135807038977807)("UserName")')
-			Notify("Copied!", "Copied To Clipboard!")
-		end)
-		AddButton("My Custom Gui", function() require(0x58B5D64A8BEB)("UserName") end)
-		AddButton("a521gs0m2c74i8hvpt12 Gui", function() require(127039250412871).idkad("UserName") end)
-		AddButton("RedLights Exe", function() require(6097532439):redlightsdontleak("UserName") end)
-		AddButton("Fare's Hub", function() require(5344766102).fare("UserName") end)
-		AddButton("GodSpawn Gui", function() require(5146396793).load("UserName") end)
-		AddButton("Spring Hub", function() require(4829576129).SpringHub("UserName") end)
-
-	elseif tabName == "Funs" then
-        AddLabel("FUNS")
-		AddButton("Survive Forsaken Killers", function()
-			Notify("Dear User", "I hope you enjoyed in this script! This Script Is Private!")
-			SafeLoad("https://pastebin.com/raw/ud8GUnvj")
-		end)
-		AddButton("Tictac Toe [BY Eric_3337]", function() SafeLoad("https://pastebin.com/raw/5T65VsEp") end)
-		AddButton("Calculator [BY Eric_3337]", function() SafeLoad("https://pastebin.com/raw/ZV9ZTwq6") end)
-		AddButton("Draw [BY LLH Lua Land]", function() SafeLoad("https://gist.githubusercontent.com/Angelo-Gitland/41392308e475849d10ddaed89de6cf82/raw/26307cee931f95d3477501399915aec2dc3dc6e7/Drawing%2520LandsUHJQ") end)
-		AddButton("Dominus Rain", function() SafeLoad("https://gist.githubusercontent.com/Angelo-Gitland/13d90676f888196c61c46a0644a4219c/raw/483d2248f0a3a68d11d987d109c10fc237c2199e/Raining%2520Dominus") end)
-		AddButton("Raining Taco", function()
-			local sound = Instance.new("Sound", LP:FindFirstChildOfClass("PlayerGui") or Gui)
-			sound.SoundId = "rbxassetid://142376088"
-			sound.Volume = 1
-			sound.Looped = true
-			sound:Play()
-			SafeLoad("https://gist.githubusercontent.com/Angelo-Gitland/32f75327c2a514eabf8bd3eb6d519f35/raw/c4a26f1acd089e316acb946ff7adf77888ab7104/It's%2520Raining%2520Taco!")
-		end)
-		AddButton("Raining Ball", function()
-			SafeLoad("https://gist.githubusercontent.com/Angelo-Gitland/666fb640f429ba18c7af9ba72b70f011/raw/a6923056f3a3a6abd70cf01f3633593f630b7dbd/Raining%2520Ball")
-		end)
-
-	elseif tabName == "Podcast" then
-		AddLabel("Dear User, We tried to Objuscate our script.")
-		AddLabel("Since skids is copying this content.")
-		AddLabel("Anti-Skid Protection")
-		AddLabel("#LuaLandSafety #LuaLandGuidelines")
-		AddLabel("#LuaLandPodcast #LuaLandPolicy's")
-		AddLabel("#LuaLandAnti-SkidProtect #Anti-Infect")
-	end
-end
-
--- Tabs
-local Tabs = {
-	"Home", "Fe Script", "Visual Script",
-	"Admin Script", "Require Script", "Funs", "Podcast"
+-- Themes table
+local Themes = {
+    ["Dark"]   = {Main=Color3.fromRGB(15,15,15), Tab=Color3.fromRGB(20,20,20), Btn=Color3.fromRGB(25,25,25), Title=Color3.fromRGB(10,10,10), Text=Color3.fromRGB(0,255,0)},
+    ["White"]  = {Main=Color3.fromRGB(240,240,240), Tab=Color3.fromRGB(230,230,230), Btn=Color3.fromRGB(210,210,210), Title=Color3.fromRGB(200,200,200), Text=Color3.fromRGB(0,0,0)},
+    ["Red"]    = {Main=Color3.fromRGB(90,0,0), Tab=Color3.fromRGB(110,0,0), Btn=Color3.fromRGB(140,0,0), Title=Color3.fromRGB(70,0,0), Text=Color3.fromRGB(255,200,200)},
+    ["Blue"]   = {Main=Color3.fromRGB(0,0,80), Tab=Color3.fromRGB(0,0,100), Btn=Color3.fromRGB(0,0,120), Title=Color3.fromRGB(0,0,60), Text=Color3.fromRGB(200,200,255)},
+    ["Yellow"] = {Main=Color3.fromRGB(120,120,0), Tab=Color3.fromRGB(140,140,0), Btn=Color3.fromRGB(160,160,0), Title=Color3.fromRGB(100,100,0), Text=Color3.fromRGB(10,10,10)},
+    ["Orange"] = {Main=Color3.fromRGB(150,70,0), Tab=Color3.fromRGB(170,80,0), Btn=Color3.fromRGB(200,100,0), Title=Color3.fromRGB(120,50,0), Text=Color3.fromRGB(255,235,200)},
+    ["Pink"]   = {Main=Color3.fromRGB(120,0,70), Tab=Color3.fromRGB(140,0,90), Btn=Color3.fromRGB(160,0,110), Title=Color3.fromRGB(100,0,60), Text=Color3.fromRGB(255,200,230)},
+    ["Green"]  = {Main=Color3.fromRGB(0,90,0), Tab=Color3.fromRGB(0,110,0), Btn=Color3.fromRGB(0,130,0), Title=Color3.fromRGB(0,70,0), Text=Color3.fromRGB(200,255,200)},
+    ["Purple"] = {Main=Color3.fromRGB(60,0,90), Tab=Color3.fromRGB(80,0,120), Btn=Color3.fromRGB(100,0,140), Title=Color3.fromRGB(50,0,80), Text=Color3.fromRGB(230,200,255)}
 }
 
-for i, tab in ipairs(Tabs) do
-	local Btn = Instance.new("TextButton", TabFrame)
-	Btn.Size = UDim2.new(1, -10, 0, 32)
-	Btn.Position = UDim2.new(0, 5, 0, (i - 1) * 36)
-	Btn.Text = tab
-	Btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-	Btn.TextColor3 = Color3.fromRGB(0, 255, 0)
-	Btn.Font = Enum.Font.Code
-	Btn.TextSize = 14
-	Btn.BorderSizePixel = 0
-	Btn.MouseButton1Click:Connect(function()
-		CreatePage(tab)
-	end)
+-- count themes
+local themeCount = 0
+for _ in pairs(Themes) do themeCount = themeCount + 1 end
+
+-- function: apply theme across GUI
+local function ApplyTheme(name)
+    local theme = Themes[name] or Themes["Dark"]
+    currentTheme = name
+    Main.BackgroundColor3 = theme.Main
+    TabFrame.BackgroundColor3 = theme.Tab
+    ContentHolder.BackgroundColor3 = theme.Main
+    Title.BackgroundColor3 = theme.Title
+    Title.TextColor3 = theme.Text
+
+    -- update tab buttons color
+    for _, obj in pairs(TabFrame:GetChildren()) do
+        if obj:IsA("TextButton") then
+            obj.BackgroundColor3 = theme.Btn
+            obj.TextColor3 = theme.Text
+        end
+    end
+
+    -- update any current page buttons (if present)
+    if currentPage then
+        for _, obj in pairs(currentPage:GetChildren()) do
+            if obj:IsA("TextButton") then
+                obj.BackgroundColor3 = theme.Btn
+                obj.TextColor3 = theme.Text
+            elseif obj:IsA("TextLabel") then
+                obj.TextColor3 = theme.Text
+            end
+        end
+    end
+
+    local Page = Instance.new("ScrollingFrame", ContentHolder)
+    Page.Size = UDim2.new(1, -10, 1, -10)
+    Page.Position = UDim2.new(0, 5, 0, 5)
+    Page.BackgroundTransparency = 1
+    Page.ScrollBarThickness = 6
+    Page.CanvasSize = UDim2.new(0, 0, 0, 0)
+    Page.AutomaticCanvasSize = Enum.AutomaticSize.Y -- for modern Roblox, but keep CanvasSize fallback
+    currentPage = Page
+
+    local layout = Instance.new("UIListLayout", Page)
+    layout.Padding = UDim.new(0, 6)
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    -- functions to add UI elements to Page
+    local function AddButton(name, callback)
+        local btn = Instance.new("TextButton", Page)
+        btn.Size = UDim2.new(1, -10, 0, 32)
+        btn.Text = name
+        btn.BackgroundColor3 = Themes[currentTheme].Btn
+        btn.TextColor3 = Themes[currentTheme].Text
+        btn.Font = Enum.Font.Code
+        btn.TextSize = 14
+        btn.BorderSizePixel = 0
+        btn.AutoButtonColor = true
+        btn.MouseButton1Click:Connect(function()
+            pcall(callback)
+        end)
+        return btn
+    end
+
+    local function AddLabel(text)
+        local lbl = Instance.new("TextLabel", Page)
+        lbl.Size = UDim2.new(1, -10, 0, 26)
+        lbl.Text = text
+        lbl.TextColor3 = Themes[currentTheme].Text
+        lbl.Font = Enum.Font.Code
+        lbl.TextSize = 16
+        lbl.BackgroundTransparency = 1
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+        return lbl
+    end
+
+    -- Centered page label for pages except Home and Podcast
+    if tabName ~= "Home" and tabName ~= "Podcast" then
+        local centerLabel = Instance.new("TextLabel", Main)
+        centerLabel.Name = "PageCenterLabel"
+        centerLabel.Size = UDim2.new(0.6, 0, 0.12, 0)
+        centerLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+        centerLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+        centerLabel.Text = string.upper(tabName) .. " PAGE"
+        centerLabel.Font = Enum.Font.Code
+        centerLabel.TextSize = 22
+        centerLabel.TextColor3 = Themes[currentTheme].Text
+        centerLabel.BackgroundTransparency = 0.9
+        centerLabel.TextScaled = false
+        centerLabel.BorderSizePixel = 0
+        centerLabel.ZIndex = 10
+    end
+
+    -- PAGE CONTENTS (complete buttons and labels)
+    if tabName == "Home" then
+        AddLabel("HOME")
+        AddLabel("NAME: " .. tostring(LP.Name or "Unknown"))
+        AddLabel("ACCOUNT AGE: " .. tostring(LP.AccountAge or "0"))
+        local fpsLabel = AddLabel("FPS: Detecting...")
+        local playersLabel = AddLabel("PLAYERS: " .. tostring(#Players:GetPlayers()))
+        RunService.RenderStepped:Connect(function(dt)
+            if fpsLabel and fpsLabel.Parent then
+                fpsLabel.Text = "FPS: " .. math.floor(1 / math.max(dt, 1/120))
+            end
+            if playersLabel and playersLabel.Parent then
+                playersLabel.Text = "PLAYERS: " .. tostring(#Players:GetPlayers())
+            end
+        end)
+
+        AddButton("Join Lua Land Hub", function()
+            pcall(function() setclipboard("https://discord.gg/mQYtHAJErm") end)
+            Notify("Copied!", "Copied To Clipboard!")
+        end)
+
+        AddButton("Join Eric_3337", function()
+            pcall(function() setclipboard("https://discord.gg/tkrKd7UBJG") end)
+            Notify("Copied!", "Copied To Clipboard!")
+        end)
+
+    elseif tabName == "Fe Script" then
+        AddLabel("FE SCRIPT")
+        AddButton("Blackhole", function() SafeLoad("https://raw.githubusercontent.com/Bac0nHck/Scripts/main/BringFlingPlayers") end)
+        AddButton("Super Ring Parts V1", function() SafeLoad("https://rawscripts.net/raw/Natural-Disaster-Survival-Super-Ring-Parts-v1-By-IKASI-27341") end)
+        AddButton("Super Ring Parts V2", function() SafeLoad("https://pastefy.app/t0djamGi/raw") end)
+        AddButton("Super Ring Parts V3", function() SafeLoad("https://pastebin.com/raw/JmAw1ucM") end)
+        AddButton("Super Ring Parts V4", function() SafeLoad("https://rawscripts.net/raw/Natural-Disaster-Survival-Super-Rings-Parts-V4-By-Lukas-24409") end)
+        AddButton("Super Ring Parts V5", function() SafeLoad("https://raw.githubusercontent.com/Lukashub-coder/Super-ring-V5/refs/heads/main/By%20lukas!!") end)
+        AddButton("Super Ring Parts V6", function() SafeLoad("https://raw.githubusercontent.com/chesslovers69/Super-ring-parts-v6/refs/heads/main/Bylukaslol") end)
+
+    elseif tabName == "Visual Script" then
+        AddLabel("VISUAL SCRIPT")
+        AddButton("c00lgui By Team c00lkidd", function() SafeLoad("https://raw.githubusercontent.com/C00lHamoot/c00lgui-1/36410b4f949d3a10e8b39fc7cdcc8cfb67aefe25/c00l%20gui") end)
+        AddButton("Potato Gui", function() SafeLoad("https://rawscripts.net/raw/Client-Replication-Potato-GUI-Lua-Version-29947") end)
+        AddButton("G00byd0lan Gui V1", function() SafeLoad("https://raw.githubusercontent.com/4izikRBX/g00byd0lan-gui-v1/refs/heads/main/g00byd0lan%20gui%20script") end)
+        AddButton("Harked Gui", function() SafeLoad("https://rawscripts.net/raw/Universal-Script-Harked-Skript-6804") end)
+        AddButton("Bluudud Gui V1", function() SafeLoad("https://rawscripts.net/raw/Universal-Script-Bluudud-gui-50126") end)
+
+    elseif tabName == "Admin Script" then
+        AddLabel("ADMIN SCRIPT")
+        AddButton("Infinite Yield", function() SafeLoad("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source") end)
+        AddButton("Kohls Admin", function() SafeLoad("https://raw.githubusercontent.com/Stefanuk12/ROBLOX/master/Games/Kohls%20Admin%20House/DarkKohls/GUI.lua") end)
+        AddButton("Legs Admin", function() SafeLoad("https://raw.githubusercontent.com/leg1337/legadmv2/main/legadminv2.lua") end)
+        AddButton("Quirky Cmds [FE]", function()
+            Notify("Notice", "This Script Only Works In Some Games!")
+            SafeLoad("https://rawscripts.net/raw/Universal-Script-QuirkyCMD-FE-admin-8667")
+        end)
+        AddButton("Brick Admin", function() SafeLoad("https://raw.githubusercontent.com/MariyaFurmanova/Library/main/un_AdminGUI") end)
+
+    elseif tabName == "Require Script" then
+        AddLabel("REQUIRE SCRIPT")
+        AddButton("Th Gui (Copy Require)", function()
+            pcall(function() setclipboard('require(135807038977807)("UserName")') end)
+            Notify("Copied!", "Copied To Clipboard!")
+        end)
+        AddButton("My Custom Gui (Require Exec)", function()
+            -- Example call (note: numbers here likely invalid; kept as in original request)
+            pcall(function() require(0x58B5D64A8BEB)("UserName") end)
+            Notify("Attempted", "Ran require call (may error if id invalid).")
+        end)
+        AddButton("a521gs0m2c74i8hvpt12 Gui", function()
+            pcall(function() require(127039250412871).idkad("UserName") end)
+            Notify("Attempted", "Ran require call (may error if id invalid).")
+        end)
+        AddButton("RedLights Exe", function()
+            pcall(function() require(6097532439):redlightsdontleak("UserName") end)
+            Notify("Attempted", "Ran require call (may error if id invalid).")
+        end)
+        AddButton("Fare's Hub", function()
+            pcall(function() require(5344766102).fare("UserName") end)
+            Notify("Attempted", "Ran require call (may error if id invalid).")
+        end)
+        AddButton("GodSpawn Gui", function()
+            pcall(function() require(5146396793).load("UserName") end)
+            Notify("Attempted", "Ran require call (may error if id invalid).")
+        end)
+        AddButton("Spring Hub", function()
+            pcall(function() require(4829576129).SpringHub("UserName") end)
+            Notify("Attempted", "Ran require call (may error if id invalid).")
+        end)
+
+    elseif tabName == "Funs" then
+        AddLabel("FUNS")
+        AddButton("Survive Forsaken Killers", function()
+            Notify("Dear User", "I hope you enjoyed in this script! This Script Is Private!")
+            SafeLoad("https://pastebin.com/raw/ud8GUnvj")
+        end)
+        AddButton("Tictac Toe [BY Eric_3337]", function() SafeLoad("https://pastebin.com/raw/5T65VsEp") end)
+        AddButton("Calculator [BY Eric_3337]", function() SafeLoad("https://pastebin.com/raw/ZV9ZTwq6") end)
+        AddButton("Draw [BY LLH Lua Land]", function() SafeLoad("https://gist.githubusercontent.com/Angelo-Gitland/41392308e475849d10ddaed89de6cf82/raw/26307cee931f95d3477501399915aec2dc3dc6e7/Drawing%2520LandsUHJQ") end)
+        AddButton("Dominus Rain", function() SafeLoad("https://gist.githubusercontent.com/Angelo-Gitland/13d90676f888196c61c46a0644a4219c/raw/483d2248f0a3a68d11d987d109c10fc237c2199e/Raining%2520Dominus") end)
+        AddButton("Raining Taco", function()
+            local ok, err = pcall(function()
+                local parentGui = LP:FindFirstChildOfClass("PlayerGui") or Gui
+                local sound = Instance.new("Sound", parentGui)
+                sound.SoundId = "rbxassetid://142376088"
+                sound.Volume = 1
+                sound.Looped = true
+                sound:Play()
+            end)
+            SafeLoad("https://gist.githubusercontent.com/Angelo-Gitland/32f75327c2a514eabf8bd3eb6d519f35/raw/c4a26f1acd089e316acb946ff7adf77888ab7104/It's%2520Raining%2520Taco!")
+        end)
+        AddButton("Raining Ball", function()
+            SafeLoad("https://gist.githubusercontent.com/Angelo-Gitland/666fb640f429ba18c7af9ba72b70f011/raw/a6923056f3a3a6abd70cf01f3633593f630b7dbd/Raining%2520Ball")
+        end)
+
+    elseif tabName == "Podcast" then
+        AddLabel("PODCAST")
+        AddLabel("Dear User, We tried to Obfuscate our script.")
+        AddLabel("Since skids is copying this content.")
+        AddLabel("Anti-Skid Protection")
+        AddLabel("#LuaLandSafety #LuaLandGuidelines")
+        AddLabel("#LuaLandPodcast #LuaLandPolicy's")
+        AddLabel("#LuaLandAnti-SkidProtect #Anti-Infect")
+
+    elseif tabName == "Settings" then
+        AddLabel("SETTINGS")
+        -- Theme dropdown button
+        local ThemeButton = Instance.new("TextButton", Page)
+        ThemeButton.Size = UDim2.new(1, -10, 0, 32)
+        ThemeButton.Text = "Theme"
+        ThemeButton.Font = Enum.Font.Code
+        ThemeButton.TextSize = 14
+        ThemeButton.BackgroundColor3 = Themes[currentTheme].Btn
+        ThemeButton.TextColor3 = Themes[currentTheme].Text
+        ThemeButton.BorderSizePixel = 0
+
+        local DropFrame = Instance.new("Frame", Page)
+        DropFrame.Size = UDim2.new(1, -10, 0, 0)
+        DropFrame.BackgroundTransparency = 1
+        DropFrame.ClipsDescendants = true
+
+        local DropLayout = Instance.new("UIListLayout", DropFrame)
+        DropLayout.Padding = UDim.new(0, 4)
+        DropLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+        local expanded = false
+        local function ToggleDropdown()
+            expanded = not expanded
+            if expanded then
+                DropFrame:TweenSize(UDim2.new(1, -10, 0, themeCount * 30), "Out", "Sine", 0.2, true)
+                -- create buttons
+                for name, _ in pairs(Themes) do
+                    if not DropFrame:FindFirstChild(name) then
+                        local colBtn = Instance.new("TextButton", DropFrame)
+                        colBtn.Name = name
+                        colBtn.Size = UDim2.new(1, -10, 0, 28)
+                        colBtn.Text = name
+                        colBtn.Font = Enum.Font.Code
+                        colBtn.TextSize = 14
+                        colBtn.TextColor3 = Themes[currentTheme].Text
+                        colBtn.BackgroundColor3 = Themes[name].Btn
+                        colBtn.BorderSizePixel = 0
+                        colBtn.MouseButton1Click:Connect(function()
+                            ApplyTheme(name)
+                            Notify("Theme Changed", name .. " Theme Applied!")
+                        end)
+                    end
+                end
+            else
+                DropFrame:TweenSize(UDim2.new(1, -10, 0, 0), "Out", "Sine", 0.2, true)
+            end
+        end
+        ThemeButton.MouseButton1Click:Connect(ToggleDropdown)
+
+        -- Reset settings button
+        AddButton("Reset Settings", function()
+            ApplyTheme("Dark")
+            Title.Text = "Dark Hacker Gui V1 | By Lua Land"
+            Notify("Reset", "Theme Reset to Default (Dark) and Title reset.")
+        end)
+
+        -- Custom Title textbox + button
+        AddButton("Custom Title (Open Input)", function()
+            local container = Instance.new("Frame", Page)
+            container.Size = UDim2.new(1, -10, 0, 70)
+            container.BackgroundTransparency = 1
+
+            local input = Instance.new("TextBox", container)
+            input.Size = UDim2.new(1, 0, 0, 30)
+            input.Position = UDim2.new(0, 0, 0, 0)
+            input.PlaceholderText = "Enter New Title..."
+            input.Text = ""
+            input.Font = Enum.Font.Code
+            input.TextColor3 = Themes[currentTheme].Text
+            input.BackgroundColor3 = Themes[currentTheme].Btn
+            input.BorderSizePixel = 0
+            input.ClearTextOnFocus = false
+
+            local applyBtn = Instance.new("TextButton", container)
+            applyBtn.Size = UDim2.new(1, 0, 0, 30)
+            applyBtn.Position = UDim2.new(0, 0, 0, 36)
+            applyBtn.Text = "Apply Title"
+            applyBtn.Font = Enum.Font.Code
+            applyBtn.TextColor3 = Themes[currentTheme].Text
+            applyBtn.BackgroundColor3 = Themes[currentTheme].Btn
+            applyBtn.BorderSizePixel = 0
+            applyBtn.MouseButton1Click:Connect(function()
+                if input.Text and input.Text ~= "" then
+                    Title.Text = input.Text
+                    Notify("Title Changed", input.Text)
+                else
+                    Notify("Title", "No text entered.")
+                end
+                container:Destroy()
+            end)
+        end)
+
+        -- Transparency slider (simple implementation using TextBox for percent)
+        AddButton("Set GUI Transparency (0-100)", function()
+            local container = Instance.new("Frame", Page)
+            container.Size = UDim2.new(1, -10, 0, 60)
+            container.BackgroundTransparency = 1
+            local info = Instance.new("TextLabel", container)
+            info.Size = UDim2.new(1, 0, 0, 20)
+            info.Text = "Enter transparency percent (0 = opaque, 100 = invisible)"
+            info.Font = Enum.Font.Code
+                        info.TextSize = 13
+            info.BackgroundTransparency = 1
+            info.TextColor3 = Themes[currentTheme].Text
+
+            local box = Instance.new("TextBox", container)
+            box.Size = UDim2.new(1, 0, 0, 30)
+            box.Position = UDim2.new(0, 0, 0, 25)
+            box.PlaceholderText = "Enter value 0-100"
+            box.Text = ""
+            box.Font = Enum.Font.Code
+            box.TextSize = 14
+            box.TextColor3 = Themes[currentTheme].Text
+            box.BackgroundColor3 = Themes[currentTheme].Btn
+            box.BorderSizePixel = 0
+            box.ClearTextOnFocus = false
+
+            box.FocusLost:Connect(function(enter)
+                if enter then
+                    local num = tonumber(box.Text)
+                    if num then
+                        num = math.clamp(num, 0, 100)
+                        local alpha = num / 100
+                        Main.BackgroundTransparency = alpha
+                        TabFrame.BackgroundTransparency = alpha
+                        ContentHolder.BackgroundTransparency = alpha
+                        Notify("Transparency", "Set to " .. num .. "%")
+                    else
+                        Notify("Invalid", "Please enter a number 0–100")
+                    end
+                    container:Destroy()
+                end
+            end)
+        end)
+    end
 end
 
--- Load Home by default
+-- Create Tabs and connect them
+local tabs = {
+    "Home",
+    "Fe Script",
+    "Visual Script",
+    "Admin Script",
+    "Require Script",
+    "Funs",
+    "Podcast",
+    "Settings"
+}
+
+local function CreateTabButton(name)
+    local btn = Instance.new("TextButton", TabFrame)
+    btn.Size = UDim2.new(1, -10, 0, 32)
+    btn.Position = UDim2.new(0, 5, 0, (#TabFrame:GetChildren() - 1) * 36)
+    btn.BackgroundColor3 = Themes[currentTheme].Btn
+    btn.TextColor3 = Themes[currentTheme].Text
+    btn.Font = Enum.Font.Code
+    btn.TextSize = 14
+    btn.Text = name
+    btn.BorderSizePixel = 0
+    btn.MouseButton1Click:Connect(function()
+        CreatePage(name)
+    end)
+end
+
+for _, tabName in ipairs(tabs) do
+    CreateTabButton(tabName)
+end
+
+-- Initialize default page + theme
+ApplyTheme("Dark")
 CreatePage("Home")
-Notify("Dark Hacker Gui", "Loaded successfully. Stay green.")
+
+Notify("Dark Hacker Gui V1", "Loaded Successfully! Created By Lua Land.")
